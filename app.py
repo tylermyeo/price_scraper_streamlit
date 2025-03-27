@@ -95,4 +95,16 @@ latest_df = product_df.sort_values("Timestamp").groupby("Region", as_index=False
 st.write(f"Latest prices for **{selected_product}**")
 df_sorted = latest_df.sort_values(by="Converted Amount")
 columns_to_show = ["Region", "Converted Amount", "Period"]
+
+# Highlight cheapest option
+# def highlight_min_row(s):
+#     is_min = s["Converted Amount"] == df_sorted["Converted Amount"].min()
+#     return ['background-color: #d4edda' if is_min else '' for _ in s]
+#
+# # Format converted amount to 2 decimal places (as string)
+# df_sorted["Converted Amount"] = df_sorted["Converted Amount"].map(lambda x: f"{x:.2f} {target_currency}")
+#
+# styled_df = df_sorted[columns_to_show].style.apply(highlight_min_row, axis=1)
+
+# Display dataframe
 st.dataframe(df_sorted[columns_to_show], hide_index=1)
