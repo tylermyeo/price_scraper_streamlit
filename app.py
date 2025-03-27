@@ -45,7 +45,9 @@ st.write("View the latest pricing of digital products from different regions.")
 selected_product = st.selectbox("Select a product", products) # Allow users to select a product
 
 # Fetch latest currency conversion rates (base = USD)
-EXCHANGE_API_URL = "https://v6.exchangerate-api.com/v6/b03ae4404090b6a8b1281057/latest/USD"
+# exchange_api_key = os.getenv("EXCHANGE_API_KEY")
+exchange_api_key = st.secrets["EXCHANGE_API_KEY"]
+EXCHANGE_API_URL = f"https://v6.exchangerate-api.com/v6/{exchange_api_key}/latest/USD"
 response = requests.get(EXCHANGE_API_URL)
 # st.write("Actual URL fetched from:", response.url)
 # st.write("Raw response content:", response.text)
