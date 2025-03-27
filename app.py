@@ -39,6 +39,11 @@ data = worksheet.get_all_records()
 df = pd.DataFrame(data)
 products = df["Product"].unique() # Extract list of unique products
 
+# Streamlit UI
+st.title("Global Pricing")
+st.write("View the latest pricing of digital products from different regions.")
+selected_product = st.selectbox("Select a product", products) # Allow users to select a product
+
 # Fetch latest currency conversion rates (base = USD)
 EXCHANGE_API_URL = "https://v6.exchangerate-api.com/v6/b03ae4404090b6a8b1281057/latest/USD"
 response = requests.get(EXCHANGE_API_URL)
@@ -47,26 +52,27 @@ response = requests.get(EXCHANGE_API_URL)
 conversion_rates = response.json().get("conversion_rates", {})
 # st.write("Fetched exchange rates:", conversion_rates)
 
-def convert_to_usd(amount, currency):
+# Streamlit UI
+target_currency = st.selectbox("Display prices in:", sorted(conversion_rates.keys()), index=sorted(conversion_rates.keys()).index("USD")) # Allow users to select currency
+
+
+# Convert currency
+def convert_currency(amount, from_currency):
     try:
-        rate = conversion_rates.get(currency)
-        if rate:
-            # st.write("Looking for rate for:", currency)
-            return round(amount / rate, 2)
-            # st.write("Rate found:", rates.get(currency))
+        from_rate = conversion_rates.get(from_currency)
+        to_rate = conversion_rates.get(target_currency)
+        if from_rate and to_rate:
+            return round((amount / from_rate) * to_rate, 2)
         else:
             return None
     except Exception:
         return None
 
-# Add a new column for converted USD prices
-df["Amount (USD)"] = df.apply(lambda row:convert_to_usd(row["Amount"], row["Currency"]),axis=1)
+# Add a new column for converted prices
+df["Converted Amount"] = df.apply(lambda row: convert_currency(row["Amount"], row["Currency"]),axis=1)
 
-# Streamlit UI
-st.title("Global Pricing")
-st.write("View the latest pricing of digital products from different regions.")
-selected_product = st.selectbox("Select a product", products) # Allow users to select a product
-product_df = df[df["Product"] == selected_product] # Filter to selected product
+# Filter to selected product
+product_df = df[df["Product"] == selected_product]
 
 # Keep only the latest entry per region
 product_df["Timestamp"] = pd.to_datetime(product_df["Timestamp"])
@@ -74,5 +80,5 @@ latest_df = product_df.sort_values("Timestamp").groupby("Region", as_index=False
 
 # Show results
 st.write(f"Latest prices for **{selected_product}**")
-df_sorted = latest_df.sort_values(by="Amount (USD)")
+df_sorted = latest_df.sort_values(by="Converted Amount")
 st.dataframe(df_sorted)
