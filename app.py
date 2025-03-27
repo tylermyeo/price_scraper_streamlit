@@ -44,9 +44,20 @@ st.title("Global Pricing")
 st.write("View the latest pricing of digital products from different regions.")
 selected_product = st.selectbox("Select a product", products) # Allow users to select a product
 
+# Get exchange API key
+try:
+    exchange_api_key = st.secrets.get("EXCHANGE_API_KEY")
+except Exception:
+    exchange_api_key = None
+
+# Fallback to .env
+if not exchange_api_key:
+    exchange_api_key = os.getenv("EXCHANGE_API_KEY")
+
+if not exchange_api_key:
+    st.error("Missing EXCHANGE_API_KEY in secrets or environment variables.")
+
 # Fetch latest currency conversion rates (base = USD)
-# exchange_api_key = os.getenv("EXCHANGE_API_KEY")
-exchange_api_key = st.secrets["EXCHANGE_API_KEY"]
 EXCHANGE_API_URL = f"https://v6.exchangerate-api.com/v6/{exchange_api_key}/latest/USD"
 response = requests.get(EXCHANGE_API_URL)
 # st.write("Actual URL fetched from:", response.url)
@@ -83,4 +94,5 @@ latest_df = product_df.sort_values("Timestamp").groupby("Region", as_index=False
 # Show results
 st.write(f"Latest prices for **{selected_product}**")
 df_sorted = latest_df.sort_values(by="Converted Amount")
-st.dataframe(df_sorted)
+columns_to_show = ["Region", "Converted Amount", "Period"]
+st.dataframe(df_sorted[columns_to_show])
