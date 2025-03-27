@@ -39,8 +39,8 @@ df = pd.DataFrame(data)
 products = df["Product"].unique() # Extract list of unique products
 
 # Streamlit UI
-st.title("Adobe Global Pricing Data")
-st.write("This app displays the latest Adobe pricing data from different regions.")
+st.title("Global Pricing")
+st.write("View the latest pricing of digital products from different regions.")
 selected_product = st.selectbox("Select a product", products) # Allow users to select a product
 product_df = df[df["Product"] == selected_product] # Filter to selected product
 
