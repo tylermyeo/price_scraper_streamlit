@@ -36,9 +36,18 @@ worksheet = spreadsheet.sheet1
 # Load data
 data = worksheet.get_all_records()
 df = pd.DataFrame(data)
+products = df["Product"].unique() # Extract list of unique products
 
 # Streamlit UI
 st.title("Adobe Global Pricing Data")
 st.write("This app displays the latest Adobe pricing data from different regions.")
+selected_product = st.selectbox("Select a product", products) # Allow users to select a product
+product_df = df[df["Product"] == selected_product] # Filter to selected product
 
-st.dataframe(df)
+# Keep only the latest entry per region
+product_df["Timestamp"] = pd.to_datetime(product_df["Timestamp"])
+latest_df = product_df.sort_values("Timestamp").groupby("Region", as_index=False).last()
+
+# Show results
+st.write(f"Latest prices for: **{selected_product}**")
+st.dataframe(latest_df)
