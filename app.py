@@ -95,4 +95,4 @@ latest_df = product_df.sort_values("Timestamp").groupby("Region", as_index=False
 st.write(f"Latest prices for **{selected_product}**")
 df_sorted = latest_df.sort_values(by="Converted Amount")
 columns_to_show = ["Region", "Converted Amount", "Period"]
-st.dataframe(df_sorted[columns_to_show])
+st.dataframe(df_sorted[columns_to_show], hide_index=1)
