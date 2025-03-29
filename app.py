@@ -40,8 +40,8 @@ df = pd.DataFrame(data)
 products = df["Product"].unique() # Extract list of unique products
 
 # Streamlit UI
-st.title("Global Pricing")
-st.write("View the latest pricing of digital products from different regions.")
+st.title("Compare Software Prices")
+st.write("Compare the latest pricing of digital products across different regions. Updated daily.")
 selected_product = st.selectbox("Select a product", products) # Allow users to select a product
 
 # Get exchange API key
@@ -108,3 +108,8 @@ columns_to_show = ["Region", "Converted Amount", "Period"]
 
 # Display dataframe
 st.dataframe(df_sorted[columns_to_show], hide_index=1)
+
+# "Last updated" timestamp
+last_updated = latest_df["Timestamp"].max()
+formatted_time = last_updated.strftime("%B %d, %Y at %H:%M")
+st.caption(f"Last updated: {formatted_time}UTC")
