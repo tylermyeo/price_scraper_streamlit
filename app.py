@@ -86,6 +86,7 @@ df["Converted Amount"] = df.apply(lambda row: convert_currency(row["Amount"], ro
 
 # Filter to selected product
 product_df = df[df["Product"] == selected_product]
+last_updated = product_df["Timestamp"].max()
 
 # Keep only the latest entry per region
 product_df["Timestamp"] = pd.to_datetime(product_df["Timestamp"])
@@ -112,4 +113,4 @@ st.dataframe(df_sorted[columns_to_show], hide_index=1)
 # "Last updated" timestamp
 last_updated = latest_df["Timestamp"].max()
 formatted_time = last_updated.strftime("%B %d, %Y at %H:%M")
-st.caption(f"Last updated: {formatted_time}UTC")
+st.caption(f"Last updated: {last_updated.strftime('%B %d, %Y at %H:%M UTC')}")
