@@ -54,14 +54,13 @@ df = load_sheet_data("Global Pricing")
 products = df["Product"].unique() # Extract list of unique products
 
 # Streamlit UI
-st.title("Compare Software Prices by Country")
+st.markdown("# Compare Software Prices by Country")
 st.badge("Beta", color="grey")
 st.markdown("""
 Looking to save on software?
 
 This tool helps you compare prices for products like **Adobe Creative Cloud**, **VPN services**, and other **digital tools** across multiple countries. Prices are shown in your preferred currency using **real-time exchange rates**.
 
-Discover where software is cheapest — and how using a **VPN** can unlock major savings.
 """)
 st.divider()
 
@@ -79,7 +78,7 @@ if not exchange_api_key:
     st.error("Missing EXCHANGE_API_KEY in secrets or environment variables.")
 
 # Fetch latest currency conversion rates (base = USD)
-@st.cache_data(ttl=3600) # Cache for 1 hour
+@st.cache_data(ttl=86400) # Cache for 24 hours
 def fetch_conversion_rates(api_key):
     url = f"https://v6.exchangerate-api.com/v6/{exchange_api_key}/latest/USD"
     response = requests.get(url)
@@ -157,45 +156,45 @@ st.caption(f"Last updated: {formatted_time}")
 st.divider()
 
 # VPN promo section
-st.subheader("Get the best price")
-st.markdown("""
-Prices for tools like Adobe Creative Cloud vary by region.  
-With a **VPN**, you can access the best regional deals — even if you're not in that country.
-""")
-col1, col2 = st.columns(2, border=True)
-with col1:
-    st.markdown("### Step 1")
-    st.markdown("**Set Your Region with a VPN**")
-    st.markdown(f"To get the best price, connect to **{cheapest_region}**.")
-    st.link_button("🌍 Get NordVPN (70% off)", "https://your-vpn-affiliate-link.com", type="primary")
-
-with col2:
-    st.markdown("### Step 2")
-    st.markdown(f"**Get {selected_product}**")
-    st.markdown("Buy from the official website.")
-    st.link_button("🎁 Buy Adobe Creative Cloud", "https://your-adobe-affiliate-link.com", type="primary")
-
-
-# FAQ Section
-with st.expander("ℹ️ How does this work?"):
-    st.markdown("""
-    We track official prices from product websites across different countries.
-
-    Each day, we:
-    - ✅ Scrape pricing pages from selected regions
-    - 💱 Convert prices to your preferred currency
-    - 🔁 Update this dashboard with the latest rates and values
-
-    **Why do prices vary by country?**  
-    Companies often adjust pricing based on local income levels, tax rules, or currency differences. A VPN can let you access those prices — from anywhere.
-    """)
-
-with st.expander("📌 Is it legal to buy from another region?"):
-    st.markdown("""
-    In most cases, **yes** — as long as the vendor accepts your payment method.
-
-    However, always review the service's **terms of use** and be aware that some companies may enforce geo-restrictions. Using a VPN typically works, but use at your own discretion.
-    """)
+# st.subheader("Get the best price")
+# st.markdown("""
+# Prices for tools like Adobe Creative Cloud vary by region.
+# With a **VPN**, you can access the best regional deals — even if you're not in that country.
+# """)
+# col1, col2 = st.columns(2, border=True)
+# with col1:
+#     st.markdown("### Step 1")
+#     st.markdown("**Set Your Region with a VPN**")
+#     st.markdown(f"To get the best price, connect to **{cheapest_region}**.")
+#     st.link_button("🌍 Get NordVPN (70% off)", "https://your-vpn-affiliate-link.com", type="primary")
+#
+# with col2:
+#     st.markdown("### Step 2")
+#     st.markdown(f"**Get {selected_product}**")
+#     st.markdown("Buy from the official website.")
+#     st.link_button("🎁 Buy Adobe Creative Cloud", "https://your-adobe-affiliate-link.com", type="primary")
+#
+#
+# # FAQ Section
+# with st.expander("ℹ️ How does this work?"):
+#     st.markdown("""
+#     We track official prices from product websites across different countries.
+#
+#     Each day, we:
+#     - ✅ Scrape pricing pages from selected regions
+#     - 💱 Convert prices to your preferred currency
+#     - 🔁 Update this dashboard with the latest rates and values
+#
+#     **Why do prices vary by country?**
+#     Companies often adjust pricing based on local income levels, tax rules, or currency differences. A VPN can let you access those prices — from anywhere.
+#     """)
+#
+# with st.expander("📌 Is it legal to buy from another region?"):
+#     st.markdown("""
+#     In most cases, **yes** — as long as the vendor accepts your payment method.
+#
+#     However, always review the service's **terms of use** and be aware that some companies may enforce geo-restrictions. Using a VPN typically works, but use at your own discretion.
+#     """)
 
 # Tip section
 st.markdown("""
