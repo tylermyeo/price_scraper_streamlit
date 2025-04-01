@@ -40,9 +40,17 @@ df = pd.DataFrame(data)
 products = df["Product"].unique() # Extract list of unique products
 
 # Streamlit UI
-st.title("Compare Software Prices")
-st.write("Compare the latest pricing of digital products across different regions. Updated daily.")
-selected_product = st.selectbox("Select a product", products) # Allow users to select a product
+st.title("Compare Software Prices by Country")
+st.badge("Beta", color="grey")
+st.markdown("""
+Looking to save on software?
+
+This tool helps you compare prices for products like **Adobe Creative Cloud**, **VPN services**, and other **digital tools** across multiple countries. Prices are shown in your preferred currency using **real-time exchange rates**.
+
+Discover where software is cheapest — and how using a **VPN** can unlock major savings.
+""")
+st.divider()
+selected_product = st.selectbox("Choose a product to compare", products) # Allow users to select a product
 
 # Get exchange API key
 try:
@@ -99,7 +107,7 @@ df_sorted["Converted Amount"] = df_sorted["Converted Amount"].map(
 )
 
 # Show results
-st.write(f"Latest prices for **{selected_product}**")
+st.subheader(f"Latest prices for **{selected_product}**")
 columns_to_show = ["Region", "Converted Amount", "Period"]
 
 # Highlight cheapest option
@@ -112,9 +120,71 @@ columns_to_show = ["Region", "Converted Amount", "Period"]
 #
 # styled_df = df_sorted[columns_to_show].style.apply(highlight_min_row, axis=1)
 
+# Cheapest option callout
+cheapest_region = latest_df.loc[latest_df["Converted Amount"].idxmin(), "Region"]
+cheapest_price = latest_df["Converted Amount"].min()
+st.success(f"💰 Best deal: **{cheapest_region}** at **{cheapest_price:.2f}** {target_currency}")
+
 # Display dataframe
 st.dataframe(df_sorted[columns_to_show], hide_index=1)
 
 # "Last updated" timestamp
 formatted_time = last_updated.strftime("%B %d, %Y at %H:%M")
 st.caption(f"Last updated: {formatted_time}")
+
+st.divider()
+
+# VPN promo section
+
+st.markdown("### 🌍 Save with a VPN")
+
+st.markdown("""
+Prices for tools like Adobe Creative Cloud vary by region.  
+With a **VPN**, you can access the best regional deals — even if you're not in that country.
+
+Try these trusted VPNs (affiliate links):
+
+- 🔒 [**NordVPN** – Up to 70% off](https://your-affiliate-link.com)
+- 🦈 [**Surfshark** – One of the cheapest VPNs](https://your-affiliate-link.com)
+- 🌐 [**ExpressVPN** – Fast, secure, and global](https://your-affiliate-link.com)
+
+> Use a VPN, choose the region with the lowest price, and subscribe directly. Easy.
+""")
+
+
+# FAQ Section
+with st.expander("ℹ️ How does this work?"):
+    st.markdown("""
+    We track official prices from product websites across different countries.
+
+    Each day, we:
+    - ✅ Scrape pricing pages from selected regions
+    - 💱 Convert prices to your preferred currency
+    - 🔁 Update this dashboard with the latest rates and values
+
+    **Why do prices vary by country?**  
+    Companies often adjust pricing based on local income levels, tax rules, or currency differences. A VPN can let you access those prices — from anywhere.
+    """)
+
+with st.expander("📌 Is it legal to buy from another region?"):
+    st.markdown("""
+    In most cases, **yes** — as long as the vendor accepts your payment method.
+
+    However, always review the service's **terms of use** and be aware that some companies may enforce geo-restrictions. Using a VPN typically works, but use at your own discretion.
+    """)
+
+# Tip section
+st.markdown("""
+### 🧠 Quick Tip: Always compare before subscribing
+
+Prices can change frequently — sometimes daily — depending on region and currency.
+Make sure you’re getting the best deal by checking this tool first!
+""")
+
+st.divider()
+
+# Newsletter / CTA
+st.markdown("""
+**Want updates when prices drop?**  
+📬 [Join the waitlist](#) to get notified when we launch tracking alerts.
+""")
