@@ -29,14 +29,15 @@ gc = gspread.authorize(creds)
 
 # Open the Google Sheet (replace with your sheet name)
 SHEET_NAME = "Global Pricing"
-spreadsheet = gc.open(SHEET_NAME)
+@st.cache_data(ttl=86400) # Cache for 24 hours
+def load_sheet_data(sheet_name):
+    spreadsheet = gc.open(sheet_name)
+    worksheet = spreadsheet.sheet1 # Select the first worksheet
+    data = worksheet.get_all_records()
+    return pd.DataFrame(data)
 
-# Select the first worksheet
-worksheet = spreadsheet.sheet1
+df = load_sheet_data("Global Pricing")
 
-# Load data
-data = worksheet.get_all_records()
-df = pd.DataFrame(data)
 products = df["Product"].unique() # Extract list of unique products
 
 # Streamlit UI
@@ -50,7 +51,6 @@ This tool helps you compare prices for products like **Adobe Creative Cloud**, *
 Discover where software is cheapest — and how using a **VPN** can unlock major savings.
 """)
 st.divider()
-selected_product = st.selectbox("Choose a product to compare", products) # Allow users to select a product
 
 # Get exchange API key
 try:
@@ -66,15 +66,24 @@ if not exchange_api_key:
     st.error("Missing EXCHANGE_API_KEY in secrets or environment variables.")
 
 # Fetch latest currency conversion rates (base = USD)
-EXCHANGE_API_URL = f"https://v6.exchangerate-api.com/v6/{exchange_api_key}/latest/USD"
-response = requests.get(EXCHANGE_API_URL)
+@st.cache_data(ttl=3600) # Cache for 1 hour
+def fetch_conversion_rates(api_key):
+    url = f"https://v6.exchangerate-api.com/v6/{exchange_api_key}/latest/USD"
+    response = requests.get(url)
+    return response.json().get("conversion_rates", {})
+
 # st.write("Actual URL fetched from:", response.url)
 # st.write("Raw response content:", response.text)
-conversion_rates = response.json().get("conversion_rates", {})
+conversion_rates = fetch_conversion_rates(exchange_api_key)
 # st.write("Fetched exchange rates:", conversion_rates)
 
 # Streamlit UI
-target_currency = st.selectbox("Display prices in:", sorted(conversion_rates.keys()), index=sorted(conversion_rates.keys()).index("USD")) # Allow users to select currency
+col1, col2 = st.columns([3, 1])
+
+with col1:
+    selected_product = st.selectbox("Choose a product to compare", products) # Allow users to select a product
+with col2:
+    target_currency = st.selectbox("Display prices in:", sorted(conversion_rates.keys()), index=sorted(conversion_rates.keys()).index("USD")) # Allow users to select currency
 
 
 # Convert currency
@@ -120,13 +129,13 @@ columns_to_show = ["Region", "Converted Amount", "Period"]
 #
 # styled_df = df_sorted[columns_to_show].style.apply(highlight_min_row, axis=1)
 
+# Display dataframe
+st.dataframe(df_sorted[columns_to_show], hide_index=1)
+
 # Cheapest option callout
 cheapest_region = latest_df.loc[latest_df["Converted Amount"].idxmin(), "Region"]
 cheapest_price = latest_df["Converted Amount"].min()
 st.success(f"💰 Best deal: **{cheapest_region}** at **{cheapest_price:.2f}** {target_currency}")
-
-# Display dataframe
-st.dataframe(df_sorted[columns_to_show], hide_index=1)
 
 # "Last updated" timestamp
 formatted_time = last_updated.strftime("%B %d, %Y at %H:%M")
@@ -135,21 +144,23 @@ st.caption(f"Last updated: {formatted_time}")
 st.divider()
 
 # VPN promo section
-
-st.markdown("### 🌍 Save with a VPN")
-
+st.subheader("Get the best price")
 st.markdown("""
 Prices for tools like Adobe Creative Cloud vary by region.  
 With a **VPN**, you can access the best regional deals — even if you're not in that country.
-
-Try these trusted VPNs (affiliate links):
-
-- 🔒 [**NordVPN** – Up to 70% off](https://your-affiliate-link.com)
-- 🦈 [**Surfshark** – One of the cheapest VPNs](https://your-affiliate-link.com)
-- 🌐 [**ExpressVPN** – Fast, secure, and global](https://your-affiliate-link.com)
-
-> Use a VPN, choose the region with the lowest price, and subscribe directly. Easy.
 """)
+col1, col2 = st.columns(2, border=True)
+with col1:
+    st.markdown("### Step 1")
+    st.markdown("**Set Your Region with a VPN**")
+    st.markdown(f"To get the best price, connect to **{cheapest_region}**.")
+    st.link_button("🌍 Get NordVPN (70% off)", "https://your-vpn-affiliate-link.com", type="primary")
+
+with col2:
+    st.markdown("### Step 2")
+    st.markdown(f"**Get {selected_product}**")
+    st.markdown("Buy from the official website.")
+    st.link_button("🎁 Buy Adobe Creative Cloud", "https://your-adobe-affiliate-link.com", type="primary")
 
 
 # FAQ Section
