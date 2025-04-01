@@ -166,7 +166,7 @@ st.divider()
 #     st.markdown("### Step 1")
 #     st.markdown("**Set Your Region with a VPN**")
 #     st.markdown(f"To get the best price, connect to **{cheapest_region}**.")
-#     st.link_button("🌍 Get NordVPN (70% off)", "https://your-vpn-affiliate-link.com", type="primary")
+#     st.link_button("🌍 Get NordVPN", "https://go.nordvpn.net/aff_c?offer_id=15&aff_id=120959&url_id=902", type="primary")
 #
 # with col2:
 #     st.markdown("### Step 2")
