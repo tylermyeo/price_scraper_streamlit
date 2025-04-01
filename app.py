@@ -7,6 +7,19 @@ from dotenv import load_dotenv
 import os
 import requests
 
+# Import font from Google Fonts
+st.markdown("""
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&display=swap" rel="stylesheet">
+    <style>
+    html, body, div, span, p, label, section, h1, h2, h3, h4, h5, h6 {
+        font-family: 'Bricolage Grotesque', sans-serif !important;
+    }
+    .stMarkdown, .stDataFrame, .css-ffhzg2, .css-1v0mbdj, .css-1d391kg {
+        font-family: 'Bricolage Grotesque', sans-serif !important;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
 # Load environment variables from .env file
 load_dotenv()
 
