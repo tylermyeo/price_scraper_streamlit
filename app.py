@@ -128,8 +128,7 @@ df_sorted["Converted Amount"] = df_sorted["Converted Amount"].map(
 )
 
 # Show results
-st.subheader(f"Latest prices for **{selected_product}**")
-columns_to_show = ["Region", "Converted Amount", "Period"]
+columns_to_show = ["Region Name", "Converted Amount", "Period"]
 
 # Highlight cheapest option
 # def highlight_min_row(s):
@@ -141,13 +140,17 @@ columns_to_show = ["Region", "Converted Amount", "Period"]
 #
 # styled_df = df_sorted[columns_to_show].style.apply(highlight_min_row, axis=1)
 
-# Display dataframe
-st.dataframe(df_sorted[columns_to_show], hide_index=1)
-
 # Cheapest option callout
 cheapest_region = latest_df.loc[latest_df["Converted Amount"].idxmin(), "Region"]
 cheapest_price = latest_df["Converted Amount"].min()
-st.success(f"💰 Best deal: **{cheapest_region}** at **{cheapest_price:.2f}** {target_currency}")
+with st.container(border=1):
+    st.badge("**BEST DEAL**", color="green")
+    st.markdown(f"### {cheapest_region} at **{cheapest_price:.2f}{target_currency}**")
+
+# Display dataframe
+region_count = len(latest_df)
+with st.expander(f"View prices across all **{region_count}** regions"):
+    st.dataframe(df_sorted[columns_to_show], hide_index=1)
 
 # "Last updated" timestamp
 formatted_time = last_updated.strftime("%B %d, %Y at %H:%M")
@@ -205,6 +208,13 @@ Make sure you’re getting the best deal by checking this tool first!
 """)
 
 st.divider()
+
+# Footer
+st.markdown("""
+---
+[Home](#) | [FAQ](#) | [Privacy Policy](#) | [Terms](#) | [Contact](#)  
+_This site uses affiliate links. We may earn a small commission when you click through — at no extra cost to you._  
+""")
 
 # Newsletter / CTA
 st.markdown("""
