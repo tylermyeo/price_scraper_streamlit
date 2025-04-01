@@ -86,15 +86,20 @@ df["Converted Amount"] = df.apply(lambda row: convert_currency(row["Amount"], ro
 
 # Filter to selected product
 product_df = df[df["Product"] == selected_product]
-last_updated = product_df["Timestamp"].max()
 
 # Keep only the latest entry per region
 product_df["Timestamp"] = pd.to_datetime(product_df["Timestamp"])
+last_updated = product_df["Timestamp"].max()
 latest_df = product_df.sort_values("Timestamp").groupby("Region", as_index=False).last()
+df_sorted = latest_df.sort_values(by="Converted Amount") # Sort by converted amount
+
+# Append currency code to Converted Amount values
+df_sorted["Converted Amount"] = df_sorted["Converted Amount"].map(
+    lambda x: f"{x:.2f} {target_currency}" if pd.notnull(x) else "N/A"
+)
 
 # Show results
 st.write(f"Latest prices for **{selected_product}**")
-df_sorted = latest_df.sort_values(by="Converted Amount")
 columns_to_show = ["Region", "Converted Amount", "Period"]
 
 # Highlight cheapest option
@@ -111,6 +116,5 @@ columns_to_show = ["Region", "Converted Amount", "Period"]
 st.dataframe(df_sorted[columns_to_show], hide_index=1)
 
 # "Last updated" timestamp
-last_updated = latest_df["Timestamp"].max()
 formatted_time = last_updated.strftime("%B %d, %Y at %H:%M")
-st.caption(f"Last updated: {last_updated.strftime('%B %d, %Y at %H:%M UTC')}")
+st.caption(f"Last updated: {formatted_time}")
