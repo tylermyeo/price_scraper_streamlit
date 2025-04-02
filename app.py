@@ -20,6 +20,11 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
+# Search Console verification tag
+st.markdown("""
+<meta name="google-site-verification" content="Zch5Tk2bzX2HMlrjwsw_SIzSo5t76wi_X1GH6rTYQig" />
+""", unsafe_allow_html=True)
+
 # Load environment variables from .env file
 load_dotenv()
 
