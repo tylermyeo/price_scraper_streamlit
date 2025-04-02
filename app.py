@@ -93,9 +93,9 @@ conversion_rates = fetch_conversion_rates(exchange_api_key)
 col1, col2 = st.columns([3, 1])
 
 with col1:
-    selected_product = st.selectbox("Choose a product to compare", products) # Allow users to select a product
+    selected_product = st.selectbox("**Choose a product to compare**", products) # Allow users to select a product
 with col2:
-    target_currency = st.selectbox("Display prices in:", sorted(conversion_rates.keys()), index=sorted(conversion_rates.keys()).index("USD")) # Allow users to select currency
+    target_currency = st.selectbox("**Display prices in**", sorted(conversion_rates.keys()), index=sorted(conversion_rates.keys()).index("USD")) # Allow users to select currency
 
 
 # Convert currency
@@ -141,11 +141,11 @@ columns_to_show = ["Region Name", "Converted Amount", "Period"]
 # styled_df = df_sorted[columns_to_show].style.apply(highlight_min_row, axis=1)
 
 # Cheapest option callout
-cheapest_region = latest_df.loc[latest_df["Converted Amount"].idxmin(), "Region"]
+cheapest_region = latest_df.loc[latest_df["Converted Amount"].idxmin(), "Region Name"]
 cheapest_price = latest_df["Converted Amount"].min()
 with st.container(border=1):
-    st.badge("**BEST DEAL**", color="green")
-    st.markdown(f"### {cheapest_region} at **{cheapest_price:.2f}{target_currency}**")
+    st.badge("**CHEAPEST REGION**", color="green")
+    st.markdown(f"### :green[{cheapest_region}] for :primary-background[**{cheapest_price:.2f}**:small[{target_currency}]]")
 
 # Display dataframe
 region_count = len(latest_df)
