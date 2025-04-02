@@ -119,7 +119,7 @@ product_df = df[df["Product"] == selected_product]
 # Keep only the latest entry per region
 product_df["Timestamp"] = pd.to_datetime(product_df["Timestamp"])
 last_updated = product_df["Timestamp"].max()
-latest_df = product_df.sort_values("Timestamp").groupby("Region", as_index=False).last()
+latest_df = product_df.sort_values("Timestamp").groupby("Region Name", as_index=False).last()
 df_sorted = latest_df.sort_values(by="Converted Amount") # Sort by converted amount
 
 # Append currency code to Converted Amount values
