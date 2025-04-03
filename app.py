@@ -121,7 +121,7 @@ product_df = df[df["Product"] == selected_product]
 product_df["Timestamp"] = pd.to_datetime(product_df["Timestamp"])
 last_updated = product_df["Timestamp"].max()
 latest_df = product_df.sort_values("Timestamp").groupby("Region Name", as_index=False).last()
-df_sorted = latest_df.sort_values(by="Converted Amount") # Sort by converted amount
+df_sorted = latest_df.sort_values(by="Converted Amount")  # Sort by converted amount
 
 # Append currency code to Converted Amount values
 df_sorted["Converted Amount"] = df_sorted["Converted Amount"].map(
@@ -131,19 +131,15 @@ df_sorted["Converted Amount"] = df_sorted["Converted Amount"].map(
 # Show results
 columns_to_show = ["Region Name", "Converted Amount", "Period"]
 
-# Highlight cheapest option
-# def highlight_min_row(s):
-#     is_min = s["Converted Amount"] == df_sorted["Converted Amount"].min()
-#     return ['background-color: #d4edda' if is_min else '' for _ in s]
-#
-# # Format converted amount to 2 decimal places (as string)
-# df_sorted["Converted Amount"] = df_sorted["Converted Amount"].map(lambda x: f"{x:.2f} {target_currency}")
-#
-# styled_df = df_sorted[columns_to_show].style.apply(highlight_min_row, axis=1)
+# Find the index of the cheapest region
+cheapest_idx = latest_df["Converted Amount"].idxmin()
+
+# Fetch values for that index
+cheapest_region = latest_df.loc[cheapest_idx, "Region Name"]
+cheapest_price = latest_df["Converted Amount"].min()
+cheapest_link = latest_df.loc[cheapest_idx, "Page Link"]
 
 # Cheapest option callout
-cheapest_region = latest_df.loc[latest_df["Converted Amount"].idxmin(), "Region Name"]
-cheapest_price = latest_df["Converted Amount"].min()
 with st.container(border=1):
     st.badge("**CHEAPEST REGION**", color="green")
     st.markdown(f"### :green[{cheapest_region}] for :primary-background[**{cheapest_price:.2f}**:small[{target_currency}]]")
@@ -160,45 +156,45 @@ st.caption(f"Last updated: {formatted_time}")
 st.divider()
 
 # VPN promo section
-# st.subheader("Get the best price")
-# st.markdown("""
-# Prices for tools like Adobe Creative Cloud vary by region.
-# With a **VPN**, you can access the best regional deals — even if you're not in that country.
-# """)
-# col1, col2 = st.columns(2, border=True)
-# with col1:
-#     st.markdown("### Step 1")
-#     st.markdown("**Set Your Region with a VPN**")
-#     st.markdown(f"To get the best price, connect to **{cheapest_region}**.")
-#     st.link_button("🌍 Get NordVPN", "https://go.nordvpn.net/aff_c?offer_id=15&aff_id=120959&url_id=902", type="primary")
-#
-# with col2:
-#     st.markdown("### Step 2")
-#     st.markdown(f"**Get {selected_product}**")
-#     st.markdown("Buy from the official website.")
-#     st.link_button("🎁 Buy Adobe Creative Cloud", "https://your-adobe-affiliate-link.com", type="primary")
-#
-#
-# # FAQ Section
-# with st.expander("ℹ️ How does this work?"):
-#     st.markdown("""
-#     We track official prices from product websites across different countries.
-#
-#     Each day, we:
-#     - ✅ Scrape pricing pages from selected regions
-#     - 💱 Convert prices to your preferred currency
-#     - 🔁 Update this dashboard with the latest rates and values
-#
-#     **Why do prices vary by country?**
-#     Companies often adjust pricing based on local income levels, tax rules, or currency differences. A VPN can let you access those prices — from anywhere.
-#     """)
-#
-# with st.expander("📌 Is it legal to buy from another region?"):
-#     st.markdown("""
-#     In most cases, **yes** — as long as the vendor accepts your payment method.
-#
-#     However, always review the service's **terms of use** and be aware that some companies may enforce geo-restrictions. Using a VPN typically works, but use at your own discretion.
-#     """)
+st.subheader("Get the best price")
+st.markdown("""
+Prices for tools like Adobe Creative Cloud vary by region.
+With a **VPN**, you can access the best regional deals — even if you're not in that country.
+""")
+col1, col2 = st.columns(2, border=True)
+with col1:
+    st.markdown("### Step 1")
+    st.markdown("**Set Your Region with a VPN**")
+    st.markdown(f"To get the best price, connect to **{cheapest_region}**.")
+    st.link_button("🌍 Get NordVPN", "https://go.nordvpn.net/aff_c?offer_id=15&aff_id=120959&url_id=902", type="primary")
+
+with col2:
+    st.markdown("### Step 2")
+    st.markdown(f"**Get {selected_product}**")
+    st.markdown("Buy from the official website.")
+    st.link_button("🎁 Buy Adobe Creative Cloud", f"{cheapest_link}", type="primary")
+
+
+# FAQ Section
+with st.expander("ℹ️ How does this work?"):
+    st.markdown("""
+    We track official prices from product websites across different countries.
+
+    Each day, we:
+    - ✅ Scrape pricing pages from selected regions
+    - 💱 Convert prices to your preferred currency
+    - 🔁 Update this dashboard with the latest rates and values
+
+    **Why do prices vary by country?**
+    Companies often adjust pricing based on local income levels, tax rules, or currency differences. A VPN can let you access those prices — from anywhere.
+    """)
+
+with st.expander("📌 Is it legal to buy from another region?"):
+    st.markdown("""
+    In most cases, **yes** — as long as the vendor accepts your payment method.
+
+    However, always review the service's **terms of use** and be aware that some companies may enforce geo-restrictions. Using a VPN typically works, but use at your own discretion.
+    """)
 
 # Tip section
 st.markdown("""
@@ -207,8 +203,6 @@ st.markdown("""
 Prices can change frequently — sometimes daily — depending on region and currency.
 Make sure you’re getting the best deal by checking this tool first!
 """)
-
-st.divider()
 
 # Footer
 st.markdown("""
