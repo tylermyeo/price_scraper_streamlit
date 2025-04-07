@@ -144,6 +144,79 @@ with st.container(border=1):
     st.badge("**CHEAPEST REGION**", color="green")
     st.markdown(f"### :green[{cheapest_region}] for :primary-background[**{cheapest_price:.2f}**:small[{target_currency}]]")
 
+# Bar chart #
+# Create a bar chart for price comparison
+st.subheader("Price Comparison by Region")
+
+# Add context to the chart
+st.caption(f"Showing the 10 cheapest regions for {selected_product} in {target_currency}")
+
+# We need to prepare the data for the bar chart
+# First, make a copy of latest_df to avoid modifying the original
+chart_df = latest_df.copy()
+
+# Convert the "Converted Amount" column to numeric values
+# This is necessary because we previously formatted it with currency symbols
+chart_df["Chart Amount"] = chart_df["Converted Amount"].astype(float)
+
+# Sort the dataframe by price (ascending)
+chart_df = chart_df.sort_values("Chart Amount")
+
+# Select only the top 10 cheapest regions to keep the chart readable
+top_regions = chart_df.head(10)
+
+# Create a dataframe specifically for the chart with regions as index
+chart_data = pd.DataFrame()
+chart_data["Region"] = top_regions["Region Name"]
+chart_data["Price"] = top_regions["Converted Amount"]  # Use the numeric values directly
+chart_data = chart_data.set_index("Region")
+chart_data = chart_data.sort_values("Price") # Sort chart by price
+
+# Create the bar chart
+st.bar_chart(chart_data, color="#EEE7EA", horizontal=True, x_label=f"Price ({target_currency})")
+
+# Line Chart #
+st.subheader("Price Trend for Cheapest Region")
+
+# What region are we looking at? The one we identified as cheapest
+cheapest_region_name = latest_df.loc[latest_df["Converted Amount"].idxmin(), "Region Name"]
+
+# Help the user interpret what they're seeing
+st.caption(f"Price history for {selected_product} in {cheapest_region_name}")
+
+# We need all historical entries for this region, not just the latest one
+cheapest_region_history = product_df[product_df["Region Name"] == cheapest_region_name].copy()
+
+# How should we prepare this data for visualization?
+# 1. Sort by timestamp to ensure chronological order
+cheapest_region_history = cheapest_region_history.sort_values("Timestamp")
+
+# 2. Create a dataframe with just the data our chart needs
+trend_data = pd.DataFrame()
+trend_data["Price"] = cheapest_region_history["Converted Amount"]
+trend_data["Timestamp"] = cheapest_region_history["Timestamp"]
+trend_data = trend_data.set_index("Timestamp")
+
+# What will this chart show our users?
+st.area_chart(trend_data, y_label=f"Price ({target_currency})", color="#EEE7EA")
+
+
+
+# Let's give users some insights from this data
+first_price = cheapest_region_history["Converted Amount"].iloc[0]
+last_price = cheapest_region_history["Converted Amount"].iloc[-1]
+percent_change = ((last_price - first_price) / first_price) * 100
+
+# if percent_change < 0:
+#     st.success(f"Good news! Prices have decreased by {abs(percent_change):.1f}% during this period.")
+# elif percent_change > 0:
+#     st.warning(f"Prices have increased by {percent_change:.1f}% during this period.")
+# else:
+#     st.info("Prices have remained stable during this period.")
+# else:
+#     # What if we don't have enough data yet?
+#     st.info("Not enough historical data available yet to show price trends. Check back soon!")
+
 # Display dataframe
 region_count = len(latest_df)
 with st.expander(f"View prices across all **{region_count}** regions"):
