@@ -55,14 +55,16 @@ df = load_sheet_data("Global Pricing")
 products = df["Product"].unique() # Extract list of unique products
 
 # Streamlit UI
-st.markdown("# Compare Software Prices by Country")
 st.badge("Beta", color="grey")
-st.markdown("""
-Looking to save on software?
+st.markdown("# Price Detective")
+st.markdown("**Compare software prices by region**")
 
-This tool helps you compare prices for products like **Adobe Creative Cloud**, **VPN services**, and other **digital tools** across multiple countries. Prices are shown in your preferred currency using **real-time exchange rates**.
-
-""")
+with st.expander(f"Looking to save on software?"):
+    st.markdown("""
+        
+    This tool helps you compare prices for products like **Adobe Creative Cloud**, **VPN services**, and other **digital tools** across multiple countries. Prices are shown in your preferred currency using **real-time exchange rates**.
+    
+    """)
 st.divider()
 
 # Get exchange API key
